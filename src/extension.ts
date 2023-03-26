@@ -1,26 +1,106 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import * as fs from 'fs';
+import * as path from 'path';
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
+const getAllPaths = async (workspaceRoot: string): Promise<string[]> => {
+  const traverse = async (dir: string) => {
+    const files = await fs.promises.readdir(dir);
+    const filePaths: string[] = (
+      await Promise.all(
+        files.map(async (file) => {
+          const fullPath = path.join(dir, file);
+          const isDirectory = (await fs.promises.lstat(fullPath)).isDirectory();
+          return isDirectory
+            ? [
+                path.relative(workspaceRoot, fullPath),
+                ...(await traverse(fullPath)),
+              ]
+            : path.relative(workspaceRoot, fullPath);
+        })
+      )
+    ).flat();
+    return filePaths;
+  };
+  return traverse(workspaceRoot);
+};
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "save-target" is now active!');
+const saveFile = async (filePath: string) => {
+  const openedDocuments = vscode.workspace.textDocuments;
+  const document = await vscode.workspace.openTextDocument(filePath);
+  const isOpenDocument = openedDocuments.find((document) => {
+    return document.uri.fsPath === filePath;
+  });
+  const editor = await vscode.window.showTextDocument(document, {
+    preview: false,
+  });
+  await vscode.commands.executeCommand('editor.action.formatDocument');
+  await editor.document.save();
+  if (!isOpenDocument) {
+    await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+  }
+};
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('save-target.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from Save Target!');
-	});
+const saveFilesInDirectory = async (directoryPath: string) => {
+  const allPaths = await getAllPaths(directoryPath);
+  const filePaths = allPaths.filter((_path: string) => {
+    const isDirectory = fs
+      .lstatSync(path.join(directoryPath, _path))
+      .isDirectory();
+    return !isDirectory;
+  });
+  for (const filePath of filePaths) {
+    await saveFile(path.join(directoryPath, filePath));
+  }
+};
 
-	context.subscriptions.push(disposable);
-}
+const generateQuickPick = (quickPickItems: any[]) => {
+  const quickPick = vscode.window.createQuickPick();
+  quickPick.items = quickPickItems;
+  quickPick.placeholder = 'Type to search for file or directory';
+  quickPick.matchOnDescription = true;
+  quickPick.matchOnDetail = true;
 
-// This method is called when your extension is deactivated
-export function deactivate() {}
+  return quickPick;
+};
+
+const selectFileOrDirectory = async (workspaceRoot: string) => {
+  const allPaths = await getAllPaths(workspaceRoot);
+  const quickPickItems = await Promise.all(
+    allPaths.map(async (_path: string) => {
+      const fullPath = path.join(workspaceRoot, _path);
+      const isDirectory = (await fs.promises.lstat(fullPath)).isDirectory();
+      return {
+        label: _path,
+        fullPath,
+        isDirectory,
+      };
+    })
+  );
+
+  const quickPick = generateQuickPick(quickPickItems);
+
+  quickPick.onDidChangeSelection(async ([item]) => {
+    if (item) {
+      const saveFunction = item.isDirectory ? saveFilesInDirectory : saveFile;
+      await saveFunction(item.fullPath);
+      quickPick.hide();
+    }
+  });
+
+  quickPick.onDidHide(() => quickPick.dispose());
+  quickPick.show();
+};
+
+export const activate = (context: any) => {
+  const disposable = vscode.commands.registerCommand(
+    'saveTarget.selectFileOrDirectory',
+    async () => {
+      const workspaceRoot = vscode.workspace.workspaceFolders![0].uri.fsPath;
+      await selectFileOrDirectory(workspaceRoot);
+    }
+  );
+
+  context.subscriptions.push(disposable);
+};
+
+export const deactivate = () => {};
