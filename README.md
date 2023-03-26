@@ -1,71 +1,27 @@
-# save-target README
+# Save Target
+![gif-animation](https://github.com/aose-yuu/save-target/issues/1#issue-1640959245)
+Save Target は、Visual Studio Code 用の拡張機能です。\
+この拡張機能を使用すると、ファイルまたはディレクトリを選択し、その中のすべてのファイルを保存することができます。\
+選択したディレクトリ内のサブディレクトリがある場合は、再帰的に同様の処理を行います。
 
-This is the README for your extension "save-target". After writing up a brief description, we recommend including the following sections.
+## 機能
 
-## Features
+- ファイルを選択して保存する。
+- ディレクトリを選択し、その中にあるすべてのファイルを保存する。
+- ディレクトリ内のサブディレクトリに対して再帰的にファイルを保存する。
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+## 使い方
 
-For example if there is an image subfolder under your extension project workspace:
+1. Visual Studio Code で、コマンドパレットを開きます。(`Cmd+Shift+P`または`Ctrl+Shift+P`)
 
-\!\[feature X\]\(images/feature-x.png\)
+2. コマンドパレットから`save target: select file or directory`を選択します。
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+3. ファイルまたはディレクトリのパスを入力するモーダルが表示されます。
 
-## Requirements
+4. 以下の処理が実行されます。
+   - 選択したものがファイルだった場合：そのファイルが VSCode 上で保存されます。
+   - 選択したものがディレクトリだった場合：そのディレクトリ内のサブディレクトリを含むすべてのファイルが VSCode 上で保存されます。
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+## 注意事項
 
-## Extension Settings
-
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
-
-## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension.
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
----
-
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+保存されるファイルは、VSCode の設定で指定されたフォーマット整形が適用されます。(ESLint, Prettier, Vetur, etc...)
