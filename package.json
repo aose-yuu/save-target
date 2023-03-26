@@ -14,8 +14,8 @@
   "contributes": {
     "commands": [
       {
-        "command": "save-target.helloWorld",
-        "title": "Hello World"
+        "command": "saveTarget.selectFileOrDirectory",
+        "title": "Save Target: Select file or directory"
       }
     ]
   },
