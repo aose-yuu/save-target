@@ -1,5 +1,5 @@
 # Save Target
-![gif-animation](https://github.com/aose-yuu/save-target/issues/1#issue-1640959245)
+![gif-animation](https://user-images.githubusercontent.com/84386322/227786476-c0f97022-8862-47cd-8cdf-a9a0caa582f3.gif)
 Save Target は、Visual Studio Code 用の拡張機能です。\
 この拡張機能を使用すると、ファイルまたはディレクトリを選択し、その中のすべてのファイルを保存することができます。\
 選択したディレクトリ内のサブディレクトリがある場合は、再帰的に同様の処理を行います。
