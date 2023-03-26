@@ -2,6 +2,7 @@
   "name": "save-target",
   "displayName": "Save Target",
   "description": "",
+  "publisher": "aose-yuu",
   "repository": {
     "type": "git",
     "url": "https://github.com/aose-yuu/save-target"
